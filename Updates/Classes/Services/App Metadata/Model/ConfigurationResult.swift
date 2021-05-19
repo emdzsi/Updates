@@ -18,6 +18,7 @@ struct ConfigurationResult: Codable {
         case releaseNotes = "release-notes"
         case updatingMode = "check-for"
         case version
+        case minVersionRequired = "min-version-required"
     }
     
     let appStoreId: String?
@@ -28,9 +29,10 @@ struct ConfigurationResult: Codable {
     let releaseNotes: String?
     let updatingMode: UpdatingMode
     let version: String?
+    let minVersionRequired: String?
     
     init(appStoreId: String?, build: String?, comparator: VersionComparator, minRequiredOSVersion: String?,
-         notifying: NotificationMode, releaseNotes: String?, updatingMode: UpdatingMode, version: String?) {
+         notifying: NotificationMode, releaseNotes: String?, updatingMode: UpdatingMode, version: String?, minVersionRequired: String?) {
         self.appStoreId = appStoreId
         self.buildString = build
         self.comparator = comparator
@@ -39,6 +41,7 @@ struct ConfigurationResult: Codable {
         self.releaseNotes = releaseNotes
         self.updatingMode = updatingMode
         self.version = version
+        self.minVersionRequired = minVersionRequired
     }
     
     init(from decoder: Decoder) throws {
@@ -51,6 +54,7 @@ struct ConfigurationResult: Codable {
         self.releaseNotes = try? container.decode(String.self, forKey: .releaseNotes)
         self.updatingMode = (try? container.decode(UpdatingMode.self, forKey: .updatingMode)) ?? .automatically
         self.version = try? container.decode(String.self, forKey: .version)
+        self.minVersionRequired = try? container.decode(String.self, forKey: .minVersionRequired)
     }
     
     func encode(to encoder: Encoder) throws {
@@ -63,6 +67,7 @@ struct ConfigurationResult: Codable {
         try container.encode(releaseNotes, forKey: .releaseNotes)
         try container.encode(updatingMode, forKey: .updatingMode)
         try container.encode(version, forKey: .version)
+        try container.encode(minVersionRequired, forKey: .minVersionRequired)
     }
     
 }
@@ -79,7 +84,8 @@ extension ConfigurationResult {
             notifying: notificationMode,
             releaseNotes: mergedReleaseNotes,
             updatingMode: updatingMode,
-            version: apiResult.version
+            version: apiResult.version,
+            minVersionRequired: minVersionRequired
         )
     }
     

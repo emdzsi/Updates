@@ -91,6 +91,8 @@ public class Updates {
     
     public static var versionString: String? = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
     
+    public static var minVersionRequired: String?
+    
     public static func checkForUpdates(currentOSVersion: String, completion: @escaping (UpdatesResult) -> Void) {
         guard let configURL = configurationURL, let cachedConfigURL = cachedConfigurationURL else {
             checkForUpdates(
@@ -164,7 +166,8 @@ public class Updates {
             notifying: notifying,
             releaseNotes: releaseNotes,
             updatingMode: updatingMode,
-            version: versionString
+            version: versionString,
+            minVersionRequired: minVersionRequired
         )
     }
     

@@ -69,7 +69,8 @@ private extension DefaultConfigurationService {
             notifying: result.notificationMode,
             releaseNotes: result.releaseNotes ?? defaults.releaseNotes,
             updatingMode: result.updatingMode,
-            version: result.version ?? defaults.version
+            version: result.version ?? defaults.version,
+            minVersionRequired: result.minVersionRequired ?? defaults.minVersionRequired
         )
     }
     

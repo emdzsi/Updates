@@ -17,4 +17,5 @@ public struct Update {
     public let newVersionString: String
     public let releaseNotes: String?
     public let shouldNotify: Bool
+    public let isMandatory: Bool
 }

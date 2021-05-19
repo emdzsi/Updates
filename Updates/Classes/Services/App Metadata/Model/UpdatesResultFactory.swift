@@ -38,12 +38,14 @@ struct UpdatesResultFactory: Factory {
             return .none
         }
         let isUpdateAvailable = isUpdateAvailableForSystemVersion()
+        let isUpdateMandatory = isUpdateMandatory()
         let shouldNotify = self.shouldNotify(for: appStoreVersion)
         let update = Update(
             appStoreId: configuration.appStoreId,
             newVersionString: appStoreVersion,
             releaseNotes: configuration.releaseNotes,
-            shouldNotify: isUpdateAvailable
+            shouldNotify: isUpdateAvailable,
+            isMandatory: isUpdateMandatory
         )
         let willNotify = (isUpdateAvailable && shouldNotify)
             || (configuration.notificationMode == .withoutAvailableUpdate)
@@ -53,6 +55,23 @@ struct UpdatesResultFactory: Factory {
 }
 
 private extension UpdatesResultFactory {
+    
+    private func isUpdateMandatory() -> Bool {
+        guard let appStoreVersion = configuration.version,
+              let minRequiredOSVersion = configuration.minOSRequired,
+              let minVersionRequired = configuration.minVersionRequired else {
+            return false
+        }
+        let isUpdateMandatory = isUpdateMandatory(
+            appVersion: bundleVersion,
+            apiVersion: appStoreVersion,
+            minVersionRequired: minVersionRequired)
+        
+        let isRequiredOSAvailable = systemVersionAvailable(
+            currentOSVersion: operatingSystemVersion,
+            requiredVersionString: minVersionRequired)
+        return isUpdateMandatory && isRequiredOSAvailable
+    }
     
     private func isUpdateAvailableForSystemVersion() -> Bool {
         guard let appStoreVersion = configuration.version,
@@ -92,6 +111,12 @@ private extension UpdatesResultFactory {
             comparator: .patch
         )
         return comparisonResult != .orderedDescending
+    }
+    
+    private func isUpdateMandatory(appVersion: String, apiVersion: String, minVersionRequired: String) -> Bool {
+        let appIsObselete = Updates.compareVersions(lhs: appVersion, rhs: minVersionRequired, comparator: .patch) == .orderedAscending
+        let minVersionAvailable = Updates.compareVersions(lhs: apiVersion, rhs: minVersionRequired, comparator: .patch) != .orderedAscending
+        return appIsObselete && minVersionAvailable
     }
     
     private func updateAvailable(appVersion: String, apiVersion: String, comparator: VersionComparator) -> Bool {
