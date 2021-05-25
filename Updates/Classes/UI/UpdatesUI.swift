@@ -85,6 +85,7 @@ public class UpdatesUI: NSObject {
                                       title: String? = nil,
                                       message: String? = nil) {
         guard case let .available(update) = result else { return }
+        updatesUI = UpdatesUI(animated: true, completion: completion)
         let alertTitle: String
         if let title = title {
             alertTitle = title
@@ -97,16 +98,18 @@ public class UpdatesUI: NSObject {
         let alert = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .alert)
         let updateButtonTitle = buttonTitle("Update")
         let updateAction = UIAlertAction(title: updateButtonTitle, style: .default) { _ in
-            alert.dismiss(animated: animated, completion: completion)
             self.presentAppStore(animated: animated, completion: completion,
                                  presentingViewController: presentingViewController)
         }
-        let cancelButtonTitle = buttonTitle("Cancel")
-        let cancelAction = UIAlertAction(title: cancelButtonTitle, style: .cancel) { _ in
-            alert.dismiss(animated: animated, completion: completion)
-        }
         alert.addAction(updateAction)
-        alert.addAction(cancelAction)
+        if !update.isMandatory {
+            let cancelButtonTitle = buttonTitle("Cancel")
+            let cancelAction = UIAlertAction(title: cancelButtonTitle, style: .cancel) { _ in
+                alert.dismiss(animated: animated, completion: completion)
+            }
+            alert.addAction(cancelAction)
+        }
+        
         presentingViewController.present(alert, animated: animated, completion: nil)
     }
     

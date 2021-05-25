@@ -131,6 +131,7 @@ public class Updates {
             completion(.none)
             return
         }
+        Updates.appStoreId = configuration.appStoreId
         registerBuild(bundleVersion: bundleVersion, buildString: buildString)
         let updatesService: UpdateResolutionService
         if let bundleIdentifier = bundleIdentifier, let countryCode = countryCode,
